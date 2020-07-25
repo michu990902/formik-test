@@ -1,7 +1,10 @@
 import { appActionTypes } from './appActionTypes'
 
 const initialState = {
-    form_data: {},
+    formData: {
+        email: "test@test.pl",
+        color: "#000"
+    },
 }
 
 const appReducer = (state = initialState, {type, payload}) => {
@@ -9,7 +12,7 @@ const appReducer = (state = initialState, {type, payload}) => {
         case appActionTypes.SET_FORM_DATA:
             return {
                 ...state,
-                form_data: payload
+                formData: payload
             }; 
         default: return state;
     }

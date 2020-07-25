@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Formik, Field } from 'formik';
 
 import styles from './Form.module.scss';
@@ -6,17 +6,20 @@ import styles from './Form.module.scss';
 import { connect } from 'react-redux';
 import { setFormData } from '../../redux/app/appActions';
 
-const Form = ({ setFormData }) => {
-    const [formValues, setFormValues] = useState({
+const Form = ({ formData, setFormData, update }) => {
+    const initialState = {
         email: "",
-        color: "#f00"
-    });
+        color: "#000"
+    };
     return (
         <div>
             <Formik
-                initialValues={formValues}
+                initialValues={update ? formData : initialState}
                 
-                onSubmit={values => console.log(values)}
+                onSubmit={async (values, {resetForm}) => {
+                    await setFormData(values)
+                    resetForm(initialState)
+                }}
 
                 validate={values => {
                     const errors = {};
@@ -29,15 +32,16 @@ const Form = ({ setFormData }) => {
                     }
                     return errors;
                 }}
-
-                render={({
+            >
+                {({
                     values,
                     errors,
                     touched,
-                    handleBlur,
+                    // handleBlur,
                     handleChange,
                     handleSubmit,
                     isSubmitting,
+                    isValid
                 }) => (
                     <form onSubmit={handleSubmit}>
                         <input 
@@ -45,32 +49,39 @@ const Form = ({ setFormData }) => {
                             name='email'
                             placeholder="email" 
                             onChange={handleChange}
-                            value={values.content}
+                            value={values.email}
                         />
                         {errors.email && <div className={styles.error}>{errors.email}</div>}
-                        <Field component="div" name="color">
+                        <br/>
+                        <label id="radio_label">Color</label>
+                        <Field component="div" name="color" value={values.color} role="radiogroup" aria-labelledby="radio_label">
                             <input
                                 type="radio"
                                 name="color"
                                 value="#fff"
+                                defaultChecked={values.color === '#fff'}
                             />
                             <input
                                 type="radio"
                                 name="color"
                                 value="#000"
+                                defaultChecked={values.color === '#000'}
                             />
                         </Field>
                         <br/>
-                        <input type="submit"/>
+                        <input type="submit" disabled={isSubmitting}/>
                     </form>
                 )}
-            />
+            </Formik>
         </div>
     );
 }
 
+const mapStateToProps = state => ({
+    formData: state.app.formData
+});
 const mapDispatchToProps = dispatch => ({
     setFormData: data => dispatch(setFormData(data))
 });
 
-export default connect(null, mapDispatchToProps)(Form);
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
