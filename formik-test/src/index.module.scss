@@ -13,4 +13,7 @@ body {
   font-family: sans-serif;
   background: var(--bg-color);
   color: var(--font-color);
+  height: 100vh;
+  display: grid;
+  place-items: center;
 }
